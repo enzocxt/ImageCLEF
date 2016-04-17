@@ -14,7 +14,7 @@
 
 
 //*******************************************************
-//code for addtion method for the accuracy of word2vec. *
+//code for direction method for the accuracy of word2vec. *
 //TBIR KULeuven 2016                                    *
 //******************************************************* 
 
@@ -51,6 +51,7 @@ int main(int argc, char **argv) {
   }
   fscanf(f, "%lld", &words);
   fscanf(f, "%lld", &size);
+  words=30000;
   vocab = (char *)malloc((long long)words * max_w * sizeof(char));
   for (a = 0; a < N; a++) bestw[a] = (char *)malloc(max_size * sizeof(char));
   M = (float *)malloc((long long)words * (long long)size * sizeof(float));
@@ -133,7 +134,8 @@ int main(int argc, char **argv) {
 
 		// null cosine similarity vector
 		for (a = 0; a < size; a++) vec[a] = 0;
-   	for (a = 0; a < size; a++) vec[a] += M[a + st3_vpos * size] - M[a + st1_vpos * size] + M[a + st2_vpos * size]; 
+   	for (a = 0; a < size; a++) vec[a] += M[a + st1_vpos * size] - M[a + st2_vpos * size]; 
+               // The equation is dw=argmax(cos(a-b,c-d')).
 
 		//normalize vector
     len = 0;
@@ -146,9 +148,9 @@ int main(int argc, char **argv) {
 			if (c == st1_vpos ) continue;
 			if (c == st2_vpos ) continue;
 			if (c == st3_vpos ) continue;
-			if (c > 30000) break;
+			if (c > 30 000) break;
 			dist = 0;
-			for (a = 0; a < size; a++) dist += vec[a] * M[a + c * size];
+			for (a = 0; a < size; a++) dist += vec[a] * (M[a+st3_vpos*size]-M[a + c * size]);
       for (a = 0; a < N; a++) {
         if (dist > bestd[a]) {
           for (d = N - 1; d > a; d--) {

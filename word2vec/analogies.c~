@@ -146,7 +146,6 @@ int main(int argc, char **argv) {
 			if (c == st1_vpos ) continue;
 			if (c == st2_vpos ) continue;
 			if (c == st3_vpos ) continue;
-			if (c > 30000) break;
 			dist = 0;
 			for (a = 0; a < size; a++) dist += vec[a] * M[a + c * size];
       for (a = 0; a < N; a++) {

@@ -14,7 +14,7 @@
 
 
 //*******************************************************
-//code for addtion method for the accuracy of word2vec. *
+//code for direction method for the accuracy of word2vec. *
 //TBIR KULeuven 2016                                    *
 //******************************************************* 
 
@@ -33,7 +33,7 @@ int main(int argc, char **argv) {
   topic[0] = 0;
 	char *bestw[N];
   char file_name[max_size], st[100][max_size];
-  float dist, len, bestd[N], vec[max_size];
+  float dist, len, bestd[N], vec[max_size],vecb[max_size],vecc[max_size];
  	long long words, size, a, b, st1_vpos, st2_vpos, st3_vpos, c, d, cn;
 	long total_questions = 0, tp = 0, missing = 0, total_cat_questions = 0;
   char ch;
@@ -51,6 +51,7 @@ int main(int argc, char **argv) {
   }
   fscanf(f, "%lld", &words);
   fscanf(f, "%lld", &size);
+//  words=30000;
   vocab = (char *)malloc((long long)words * max_w * sizeof(char));
   for (a = 0; a < N; a++) bestw[a] = (char *)malloc(max_size * sizeof(char));
   M = (float *)malloc((long long)words * (long long)size * sizeof(float));
@@ -131,35 +132,51 @@ int main(int argc, char **argv) {
 			continue;
 		}
 
-		// null cosine similarity vector
+	      // The equation is dw=argmax(cos(a-b,c-d')).
 		for (a = 0; a < size; a++) vec[a] = 0;
-   	for (a = 0; a < size; a++) vec[a] += M[a + st3_vpos * size] - M[a + st1_vpos * size] + M[a + st2_vpos * size]; 
+   		for (a = 0; a < size; a++) vec[a] += M[a + st1_vpos * size] - M[a + st2_vpos * size]; 
+     
+                for (a = 0; a < size; a++) vecc[a] = 0;
+   		for (a = 0; a < size; a++) vecc[a] +=M[a + st3_vpos * size]; 
 
-		//normalize vector
-    len = 0;
-    for (a = 0; a < size; a++) len += vec[a] * vec[a];
-    len = sqrt(len);
-    for (a = 0; a < size; a++) vec[a] /= len;
+		
+	       //normalize vector
+			 len = 0;
+			 for (a = 0; a < size; a++) len += vec[a] * vec[a];
+			 len = sqrt(len);
+			 for (a = 0; a < size; a++) vec[a] /= len;
     
-		for(c = 0; c < words; c++) {
-			//skip input words
+	         for(c = 0; c < words; c++) {
+	     
+              
+              //skip input words
 			if (c == st1_vpos ) continue;
 			if (c == st2_vpos ) continue;
 			if (c == st3_vpos ) continue;
-			if (c > 30000) break;
+			if (c > 60000) break;
 			dist = 0;
-			for (a = 0; a < size; a++) dist += vec[a] * M[a + c * size];
-      for (a = 0; a < N; a++) {
-        if (dist > bestd[a]) {
-          for (d = N - 1; d > a; d--) {
-            bestd[d] = bestd[d - 1];
-            strcpy(bestw[d], bestw[d - 1]);
-          }
-          bestd[a] = dist;
-          strcpy(bestw[a], &vocab[c * max_w]);
-          break;
-        }
-      }
+                        for (a = 0; a < size; a++) vecb[a] = 0;
+			for (a = 0; a < size; a++) vecb[a]= M[a+st3_vpos*size]-vecc[a];//to caculate c-d'
+             
+              //normalize vector	
+			len = 0;
+			for (a = 0; a < size; a++) len += vecb[a] * vecb[a];
+			len = sqrt(len);
+			for (a = 0; a < size; a++) vecb[a] /= len;
+	
+             //to caculate the cosine of (a-b,c-d')	
+             for (a = 0; a < size; a++) dist += vec[a] *vecb[a];
+		        for (a = 0; a < N; a++) {
+			if (dist > bestd[a]) {
+			  for (d = N - 1; d > a; d--) {
+			    bestd[d] = bestd[d - 1];
+			    strcpy(bestw[d], bestw[d - 1]);
+			  }
+			  bestd[a] = dist;
+			  strcpy(bestw[a], &vocab[c * max_w]);
+			  break;
+			}
+		      }
 
 		}
 		
