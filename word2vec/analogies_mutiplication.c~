@@ -13,10 +13,10 @@
 //  limitations under the License.
 
 
-//*******************************************************
+//**************************************************************
 //code for multiplication method for the accuracy of word2vec. *
-//TBIR KULeuven 2016                                      *
-//******************************************************* 
+//TBIR KULeuven 2016                                           *
+//************************************************************** 
 
 #include <stdio.h>
 #include <string.h>
@@ -146,9 +146,22 @@ int main(int argc, char **argv) {
 			if (c == st1_vpos ) continue;
 			if (c == st2_vpos ) continue;
 			if (c == st3_vpos ) continue;
-			if (c >= 30000) break;
-			dist = 0;
-			for (a = 0; a < size; a++) dist += vec[a] * M[a + c * size];
+			if (c > 60000) break;
+		      dist = 0;
+		      float cad = 0;
+		      float cbd = 0;
+		      float ccd = 0;
+		      
+		      for (a = 0; a < size; a++) cad += M[a + st1_vpos * size] * M[a + c * size]; //cos(d',a)     
+		      for (a = 0; a < size; a++) cbd += M[a + st2_vpos * size] * M[a + c * size]; //cos(d',b)     
+		      for (a = 0; a < size; a++) ccd += M[a + st3_vpos * size] * M[a + c * size]; //cos(d',c)     
+
+		      cad = (cad + 1)/2;
+		      cbd = (cbd + 1)/2;
+		      ccd = (ccd + 1)/2;
+
+		      if(cad == 0)  cad = 0.001;
+		      dist = (ccd * cbd) / cad;
       for (a = 0; a < N; a++) {
         if (dist > bestd[a]) {
           for (d = N - 1; d > a; d--) {

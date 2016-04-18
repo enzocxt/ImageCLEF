@@ -70,10 +70,6 @@ int main(int argc, char **argv) {
     for (a = 0; a < size; a++) {
 			fread(&M[a + b * size], sizeof(float), 1, f);
 		}
-		len = 0;
-    for (a = 0; a < size; a++) len += M[a + b * size] * M[a + b * size];
-    len = sqrt(len);
-    for (a = 0; a < size; a++) M[a + b * size] /= len;
   }
   fclose(f);
 
@@ -134,11 +130,8 @@ int main(int argc, char **argv) {
 
 	      // The equation is dw=argmax(cos(a-b,c-d')).
 		for (a = 0; a < size; a++) vec[a] = 0;
-   		for (a = 0; a < size; a++) vec[a] += M[a + st1_vpos * size] - M[a + st2_vpos * size]; 
+   		for (a = 0; a < size; a++) vec[a] += M[a + st1_vpos * size] - M[a + st2_vpos * size]; //caculate a-b
      
-                for (a = 0; a < size; a++) vecc[a] = 0;
-   		for (a = 0; a < size; a++) vecc[a] +=M[a + st3_vpos * size]; 
-
 		
 	       //normalize vector
 			 len = 0;
@@ -153,10 +146,10 @@ int main(int argc, char **argv) {
 			if (c == st1_vpos ) continue;
 			if (c == st2_vpos ) continue;
 			if (c == st3_vpos ) continue;
-			if (c > 60000) break;
+			if (c > 30000) break;
 			dist = 0;
                         for (a = 0; a < size; a++) vecb[a] = 0;
-			for (a = 0; a < size; a++) vecb[a]= M[a+st3_vpos*size]-vecc[a];//to caculate c-d'
+			for (a = 0; a < size; a++) vecb[a]= M[a+st3_vpos*size]-M[a + c * size];//to caculate c-d'
              
               //normalize vector	
 			len = 0;
